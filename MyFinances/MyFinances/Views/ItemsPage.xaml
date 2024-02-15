@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MyFinances.Views.ItemsPage"
+             Title="{Binding Title}"
+             xmlns:local="clr-namespace:MyFinances.ViewModels"  
+             xmlns:model="clr-namespace:MyFinances.Core.Dtos;assembly=MyFinances.Core"  
+             x:Name="BrowseItemsPage">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Dodaj" Command="{Binding AddItemCommand}" />
+    </ContentPage.ToolbarItems>
+    <!--
+      x:DataType enables compiled bindings for better performance and compile time validation of binding expressions.
+      https://docs.microsoft.com/xamarin/xamarin-forms/app-fundamentals/data-binding/compiled-bindings
+    -->
+    <RefreshView x:DataType="local:ItemsViewModel" 
+                 Command="{Binding LoadItemsCommand}" 
+                 IsRefreshing="{Binding IsBusy, Mode=TwoWay}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <CollectionView x:Name="ItemsListView"
+                            ItemsSource="{Binding Operations}"
+                            SelectionMode="None"
+                            Grid.ColumnSpan="2">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Padding="10" x:DataType="model:OperationDto">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackLayout Padding="10" x:DataType="model:OperationDto">
+                                <Label Text="{Binding Name}" 
+                                    LineBreakMode="NoWrap" 
+                                    Style="{DynamicResource ListItemTextStyle}" 
+                                    FontSize="16" />
+
+                                <Label Text="{Binding Description}" 
+                                    LineBreakMode="NoWrap"
+                                    Style="{DynamicResource ListItemDetailTextStyle}"
+                                    FontSize="13" />
+
+                                <Label Text="{Binding Value}" 
+                                    LineBreakMode="NoWrap"
+                                    Style="{DynamicResource ListItemDetailTextStyle}"
+                                    FontSize="13" />
+
+                                <Label Text="{Binding Date, StringFormat='{0:dd:MM:yyyy}'}" 
+                                    LineBreakMode="NoWrap"
+                                    Style="{DynamicResource ListItemDetailTextStyle}"
+                                    FontSize="13" />
+                            </StackLayout>
+                            <Button Grid.Column="1"
+                                WidthRequest="70"
+                                HeightRequest="35"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center"
+                                Text="Usuń"
+                                FontSize="10"
+                                BackgroundColor="OrangeRed"
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type local:ItemsViewModel}}, Path=DeleteItemCommand}"
+                                CommandParameter="{Binding .}"
+                            />
+
+
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer 
+                                    NumberOfTapsRequired="1"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type local:ItemsViewModel}}, Path=ItemTapped}"		
+                                    CommandParameter="{Binding .}">
+                                </TapGestureRecognizer>
+                            </Grid.GestureRecognizers>
+                        </Grid>
+
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+                
+                <Button Text="Poprzednia strona"
+                        Margin="5"
+                        Grid.Row="1"
+                        Command="{Binding PreviousPageCommand}"/>
+                <Button Text="Następna strona"
+                        Margin="5"
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Command="{Binding NextPageCommand}"/>
+
+        </Grid>
+
+    </RefreshView>
+</ContentPage>
